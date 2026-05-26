@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,18 +23,28 @@ public class CuponController {
     private CuponService cuponService;
 
     @PostMapping
-    public CuponDescuento crearCupon(@RequestBody CuponDescuento cupon) {
-        return cuponService.guardar(cupon);
+    public ResponseEntity<?> crearCupon(@RequestBody CuponDescuento cupon) {
+        try {
+            CuponDescuento nuevo = cuponService.guardar(cupon);
+            if (nuevo == null) {
+                return new ResponseEntity<>("No se pudo crear el cupón", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(nuevo, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("Error al crear el cupón", HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/{codigo}")
-    public ResponseEntity<?> buscar(@PathVariable String codigo){
-        Optional<CuponDescuento> cupon = cuponService.buscarPorCodigo(codigo);
-
-        if(cupon.isEmpty()){
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> buscar(@PathVariable String codigo) {
+        try {
+            Optional<CuponDescuento> cupon = cuponService.buscarPorCodigo(codigo);
+            if (cupon.isEmpty()) {
+                return new ResponseEntity<>("Cupón no encontrado", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(cupon.get(), HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("Error al buscar cupón", HttpStatus.CONFLICT);
         }
-
-        return ResponseEntity.ok(cupon.get());
     }
 }
