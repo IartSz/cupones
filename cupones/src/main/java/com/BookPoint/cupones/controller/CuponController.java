@@ -17,7 +17,7 @@ import com.BookPoint.cupones.model.CuponDescuento;
 import com.BookPoint.cupones.service.CuponService;
 
 @RestController
-@RequestMapping("/api/cupones")
+@RequestMapping("/api/v1/cupones")
 public class CuponController {
     @Autowired
     private CuponService cuponService;
