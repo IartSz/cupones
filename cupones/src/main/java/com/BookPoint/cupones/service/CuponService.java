@@ -1,5 +1,6 @@
 package com.BookPoint.cupones.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,25 @@ public class CuponService {
         return cuponRepository.save(cupon);
     }
 
+    public List<CuponDescuento> listar(){
+        return cuponRepository.findAll();
+    }
+
+    public void eliminarCupon(Long id){
+        cuponRepository.deleteById(id);
+    }
+
     public Optional<CuponDescuento> buscarPorCodigo(String codigo){
         return cuponRepository.findByCodigo(codigo);
+    }
+
+    public CuponDescuento actualizar(Long id, CuponDescuento cupondescuento){
+        CuponDescuento existente = cuponRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Cupón no encontrado"));
+        
+        existente.setCodigo(cupondescuento.getCodigo());
+        existente.setPorcentajeDescuento(cupondescuento.getPorcentajeDescuento());
+
+        return cuponRepository.save(existente);
     }
 }
